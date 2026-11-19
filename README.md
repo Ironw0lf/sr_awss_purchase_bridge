@@ -27,6 +27,15 @@ modified, only extended.
   parts (product, quantity, unit price) and its analytic distribution on
   every line - opened with `analytic_locked` set so the requester's
   department default never overwrites it.
+- Only real purchases go to approval. Parts the warehouse already holds
+  (free quantity covers the need) are left out and issued from stock with
+  Stock Issue; stocked parts running short that have an active Min/Max
+  (reordering) rule are left out too and follow the replenishment process;
+  a stocked part short with no Min/Max rule is requested for the missing
+  quantity only; products that are not stocked (services...) are requested
+  in full. Parts already issued are ignored. When nothing needs buying, a
+  message says so instead of opening an empty request, and a note in the
+  work order's chatter lists what was left out and why.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.

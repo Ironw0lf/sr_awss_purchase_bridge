@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from odoo import _, models
 
+from .purchase_needs import purchase_needs
+
 
 class SrWorkorder(models.Model):
     _inherit = 'sr.workorder'
@@ -29,17 +31,39 @@ class SrWorkorder(models.Model):
         # overwritten downstream.
         analytic_distribution = self.analytic_distribution or False
 
+        # Only real purchases go to approval: parts the warehouse holds are
+        # issued from stock, and short stocked parts under a Min/Max rule
+        # follow the replenishment process (see purchase_needs).
+        needs = purchase_needs(self)
+
+        self._post_purchase_split_note(needs)
+
+        if not needs['buy']:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _("Nothing to purchase"),
+                    'message': _(
+                        "Every part is either in stock (use Stock Issue) or "
+                        "covered by the replenishment process. No purchase "
+                        "request is needed."
+                    ),
+                    'type': 'info',
+                    'sticky': False,
+                },
+            }
+
         line_commands = [
             (0, 0, {
                 'product_id': line.product_id.id,
                 'name': line.description or line.product_id.display_name,
-                'product_qty': line.quantity,
+                'product_qty': quantity,
                 'product_uom': line.product_id.uom_id.id,
                 'price_unit': line.unit_price,
                 'analytic_distribution': analytic_distribution,
             })
-            for line in self.line_ids
-            if line.product_id
+            for line, quantity in needs['buy']
         ]
 
         return {
@@ -59,6 +83,25 @@ class SrWorkorder(models.Model):
                 'default_analytic_locked': True,
             },
         }
+
+    def _post_purchase_split_note(self, needs):
+        """Say in the chatter which parts were left out of the purchase
+        request and why, so nobody wonders where a line went."""
+        left_out = []
+        if needs['in_stock']:
+            left_out.append(_(
+                "In stock, to issue with Stock Issue: %s",
+                ', '.join(l.product_id.display_name for l, _q in needs['in_stock']),
+            ))
+        if needs['replenish']:
+            left_out.append(_(
+                "Short but covered by a Min/Max rule, left to replenishment: %s",
+                ', '.join(l.product_id.display_name for l, _q in needs['replenish']),
+            ))
+        if left_out:
+            self.message_post(body='<br/>'.join(
+                [_("Parts not included in the purchase request:")] + left_out
+            ))
 
     def action_view_purchases(self):
         self.ensure_one()
