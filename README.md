@@ -48,6 +48,12 @@ modified, only extended.
   row opens the record full screen instead of in a pop-up. Purchase cost on
   the work order still comes from the purchase orders, which an approved
   request creates with the work-order link.
+- Both ways to add a purchase to a work order open a Purchase Request: the
+  header's Create Purchase button and the tab's Add a purchase request
+  button call the same method. As a safeguard, a purchase order linked to a
+  work order without a source Purchase Request (`awss_source_request_id`)
+  is refused, however it is attempted (form, import, API), so no RFQ can be
+  raised outside the approval flow. Existing orders are not touched.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.

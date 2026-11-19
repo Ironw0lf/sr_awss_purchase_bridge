@@ -3,8 +3,9 @@
 
     <!-- The Purchases tab shows the work order's Purchase Requests (the AWSS
          purchasing flow) first, then its purchase orders read-only. Neither list
-         can create: a purchase is started with the Create Purchase button, which
-         opens a Purchase Request full screen. The arrow at the end of each row
+         can create: a purchase is started with the Create Purchase button or the
+         Add a purchase request button of the tab, which both open a Purchase
+         Request full screen. The arrow at the end of each row
          opens the record full screen instead of in a pop-up. -->
     <record id="view_sr_workorder_form_awss_bridge" model="ir.ui.view">
         <field name="name">sr.workorder.form.awss.bridge</field>
@@ -13,6 +14,14 @@
         <field name="arch" type="xml">
 
             <field name="purchase_order_ids" position="before">
+                <!-- Same method as the header's Create Purchase: both ways to
+                     add a purchase open a new Purchase Request. -->
+                <div class="mb-2">
+                    <button name="action_create_purchase" type="object"
+                            string="Add a purchase request"
+                            icon="fa-plus" class="btn-secondary"
+                            invisible="state in ('request', 'close', 'cancel')"/>
+                </div>
                 <separator string="Purchase Requests"/>
                 <field name="purchase_request_ids" readonly="1">
                     <list editable="bottom" create="0" delete="0" open_form_view="1">
