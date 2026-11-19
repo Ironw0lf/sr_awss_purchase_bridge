@@ -1,11 +1,27 @@
 # -*- coding: utf-8 -*-
-from odoo import _, models
+from odoo import _, api, fields, models
 
 from .purchase_needs import purchase_needs
 
 
 class SrWorkorder(models.Model):
     _inherit = 'sr.workorder'
+
+    # The work order's purchasing at AWSS is the Purchase Request (PR): the
+    # raw purchase order only exists once a PR is approved. sr_maintenance's
+    # own link is to purchase orders (RFQs), which a PR does not create until
+    # approval, so the PR is what the Purchases tab and its counter must show.
+    purchase_request_ids = fields.One2many(
+        'awss.purchase.request',
+        'sr_workorder_id',
+        string='Purchase Requests',
+        readonly=True,
+    )
+
+    @api.depends('purchase_request_ids')
+    def _compute_purchase_count(self):
+        for rec in self:
+            rec.purchase_count = len(rec.purchase_request_ids)
 
     def action_create_purchase(self):
         # AWSS requires every purchase to go through the Purchase Request
@@ -99,18 +115,6 @@ class SrWorkorder(models.Model):
 
     def action_view_purchases(self):
         self.ensure_one()
-
-        # The smart button's count is the number of purchase orders linked to
-        # the work order. A purchase order that was not raised through a
-        # request linked to this work order (created directly, or before this
-        # bridge, or from a request opened outside the work order's button)
-        # has no Purchase Request to list, so the button would open an empty
-        # list under a count of 2. In that case show the purchase orders.
-        has_requests = self.env['awss.purchase.request'].search_count(
-            [('sr_workorder_id', '=', self.id)], limit=1
-        )
-        if not has_requests and self.purchase_order_ids:
-            return super().action_view_purchases()
 
         return {
             'type': 'ir.actions.act_window',

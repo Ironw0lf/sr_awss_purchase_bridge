@@ -38,6 +38,16 @@ modified, only extended.
   parts don't cover: with nothing to buy from the parts, the request
   opens empty. A note in the work order's chatter lists what was left out
   and why (once per identical list).
+- The work order's **Purchases** tab and its counter now show the Purchase
+  Requests (`purchase_request_ids`), not purchase orders. AWSS's purchasing
+  is the request: a purchase order only exists once a request is approved,
+  so listing RFQs/purchase orders there was the wrong object. Requests are
+  listed first, the work order's purchase orders read-only below them, and
+  neither list can create (a purchase is started with Create Purchase,
+  which opens a Purchase Request full screen). The arrow at the end of each
+  row opens the record full screen instead of in a pop-up. Purchase cost on
+  the work order still comes from the purchase orders, which an approved
+  request creates with the work-order link.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.
@@ -45,10 +55,6 @@ modified, only extended.
   order's Purchase Requests instead of Purchase Orders - a request
   already gives access to the resulting order once approved, via its own
   smart button.
-  When the work order has purchase orders but no Purchase Request linked
-  to it (orders created directly, or before this bridge), the button opens
-  those purchase orders instead, so it never lands on an empty list under
-  a non-zero count.
 
 ## Dependencies
 

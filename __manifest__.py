@@ -38,6 +38,7 @@ Requires both sr_maintenance and awss_purchase_request >= 19.0.4.9
     ],
     'data': [
         'views/awss_purchase_request_views.xml',
+        'views/sr_workorder_views.xml',
     ],
     'installable': True,
     'application': False,

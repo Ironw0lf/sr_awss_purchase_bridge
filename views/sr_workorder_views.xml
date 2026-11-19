@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- The Purchases tab shows the work order's Purchase Requests (the AWSS
+         purchasing flow) first, then its purchase orders read-only. Neither list
+         can create: a purchase is started with the Create Purchase button, which
+         opens a Purchase Request full screen. The arrow at the end of each row
+         opens the record full screen instead of in a pop-up. -->
+    <record id="view_sr_workorder_form_awss_bridge" model="ir.ui.view">
+        <field name="name">sr.workorder.form.awss.bridge</field>
+        <field name="model">sr.workorder</field>
+        <field name="inherit_id" ref="sr_maintenance.view_sr_workorder_form"/>
+        <field name="arch" type="xml">
+
+            <field name="purchase_order_ids" position="before">
+                <separator string="Purchase Requests"/>
+                <field name="purchase_request_ids" readonly="1">
+                    <list editable="bottom" create="0" delete="0" open_form_view="1">
+                        <field name="name"/>
+                        <field name="requester_id"/>
+                        <field name="department_id"/>
+                        <field name="partner_id"/>
+                        <field name="amount_total" sum="Total"/>
+                        <field name="state" widget="badge"
+                               decoration-success="state == 'approved'"
+                               decoration-danger="state == 'rejected'"
+                               decoration-muted="state == 'cancel'"
+                               decoration-info="state in ('submitted', 'sourcing', 'approval')"/>
+                        <field name="currency_id" column_invisible="1"/>
+                    </list>
+                </field>
+                <separator string="Purchase Orders"/>
+            </field>
+
+            <field name="purchase_order_ids" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </field>
+            <xpath expr="//field[@name='purchase_order_ids']/list" position="attributes">
+                <attribute name="editable">bottom</attribute>
+                <attribute name="create">0</attribute>
+                <attribute name="delete">0</attribute>
+                <attribute name="open_form_view">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='purchase_order_ids']/list/control" position="replace"/>
+
+        </field>
+    </record>
+
+</odoo>
