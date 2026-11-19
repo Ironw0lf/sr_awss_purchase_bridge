@@ -33,9 +33,11 @@ modified, only extended.
   (reordering) rule are left out too and follow the replenishment process;
   a stocked part short with no Min/Max rule is requested for the missing
   quantity only; products that are not stocked (services...) are requested
-  in full. Parts already issued are ignored. When nothing needs buying, a
-  message says so instead of opening an empty request, and a note in the
-  work order's chatter lists what was left out and why.
+  in full. Parts already issued are ignored. The button always opens a
+  new Purchase Request, so a purchase can be raised for something the
+  parts don't cover: with nothing to buy from the parts, the request
+  opens empty. A note in the work order's chatter lists what was left out
+  and why (once per identical list).
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.

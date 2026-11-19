@@ -38,22 +38,6 @@ class SrWorkorder(models.Model):
 
         self._post_purchase_split_note(needs)
 
-        if not needs['buy']:
-            return {
-                'type': 'ir.actions.client',
-                'tag': 'display_notification',
-                'params': {
-                    'title': _("Nothing to purchase"),
-                    'message': _(
-                        "Every part is either in stock (use Stock Issue) or "
-                        "covered by the replenishment process. No purchase "
-                        "request is needed."
-                    ),
-                    'type': 'info',
-                    'sticky': False,
-                },
-            }
-
         line_commands = [
             (0, 0, {
                 'product_id': line.product_id.id,
@@ -66,22 +50,28 @@ class SrWorkorder(models.Model):
             for line, quantity in needs['buy']
         ]
 
+        # The button always opens a new request, so a purchase can still be
+        # raised for something the work order's parts don't cover. With
+        # nothing to buy from the parts, the request simply opens empty.
+        context = {
+            'default_sr_workorder_id': self.id,
+            'default_requester_id': employee.id,
+            'default_motivation': self.name,
+            # Keeps the WO's analytic distribution on the lines - without
+            # this, the header Analytic Account (computed from the
+            # requester's department) pushes onto every line on open and
+            # replaces what we just set above.
+            'default_analytic_locked': True,
+        }
+        if line_commands:
+            context['default_line_ids'] = line_commands
+
         return {
             'type': 'ir.actions.act_window',
             'name': _("New Purchase Request"),
             'res_model': 'awss.purchase.request',
             'view_mode': 'form',
-            'context': {
-                'default_sr_workorder_id': self.id,
-                'default_requester_id': employee.id,
-                'default_line_ids': line_commands,
-                'default_motivation': self.name,
-                # Keeps the WO's analytic distribution on the lines - without
-                # this, the header Analytic Account (computed from the
-                # requester's department) pushes onto every line on open and
-                # replaces what we just set above.
-                'default_analytic_locked': True,
-            },
+            'context': context,
         }
 
     def _post_purchase_split_note(self, needs):
@@ -99,9 +89,13 @@ class SrWorkorder(models.Model):
                 ', '.join(l.product_id.display_name for l, _q in needs['replenish']),
             ))
         if left_out:
-            self.message_post(body='<br/>'.join(
+            body = '<br/>'.join(
                 [_("Parts not included in the purchase request:")] + left_out
-            ))
+            )
+            # The button is also how a new, free-form purchase is started, so
+            # it can be clicked many times: don't repeat an identical note.
+            if not self.message_ids.filtered(lambda m: m.body and body in m.body):
+                self.message_post(body=body)
 
     def action_view_purchases(self):
         self.ensure_one()
