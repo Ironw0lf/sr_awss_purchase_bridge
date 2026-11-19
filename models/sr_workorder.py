@@ -18,6 +18,18 @@ class SrWorkorder(models.Model):
         readonly=True,
     )
 
+    # The requests still open: one that was approved became a purchase order,
+    # which the tab lists on its own, so showing both would repeat the same
+    # purchase. The counter and the Purchases button keep counting every
+    # request.
+    purchase_request_open_ids = fields.One2many(
+        'awss.purchase.request',
+        'sr_workorder_id',
+        string='Open Purchase Requests',
+        domain=[('purchase_order_id', '=', False)],
+        readonly=True,
+    )
+
     @api.depends('purchase_request_ids')
     def _compute_purchase_count(self):
         for rec in self:

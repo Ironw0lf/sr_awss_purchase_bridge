@@ -41,8 +41,10 @@ modified, only extended.
 - The work order's **Purchases** tab and its counter now show the Purchase
   Requests (`purchase_request_ids`), not purchase orders. AWSS's purchasing
   is the request: a purchase order only exists once a request is approved,
-  so listing RFQs/purchase orders there was the wrong object. Requests are
-  listed first, the work order's purchase orders read-only below them, and
+  so listing RFQs/purchase orders there was the wrong object. Open requests
+  are listed first (a request already converted into a purchase order is
+  not repeated: the order stands for it), the work order's purchase orders
+  read-only below them, and
   neither list can create (a purchase is started with Create Purchase,
   which opens a Purchase Request full screen). The arrow at the end of each
   row opens the record full screen instead of in a pop-up. Purchase cost on

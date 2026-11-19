@@ -22,8 +22,8 @@
                             icon="fa-plus" class="btn-secondary"
                             invisible="state in ('request', 'close', 'cancel')"/>
                 </div>
-                <separator string="Purchase Requests"/>
-                <field name="purchase_request_ids" readonly="1">
+                <separator string="Purchase Requests (open)"/>
+                <field name="purchase_request_open_ids" readonly="1">
                     <list editable="bottom" create="0" delete="0" open_form_view="1">
                         <field name="name"/>
                         <field name="requester_id"/>
