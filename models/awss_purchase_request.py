@@ -13,6 +13,21 @@ class AwssPurchaseRequest(models.Model):
         help='The SR Maintenance work order this purchase request was raised from.',
     )
 
+    sr_workorder_name = fields.Char(
+        related='sr_workorder_id.name',
+        string='Work Order Number',
+    )
+
+    def action_view_sr_workorder(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'sr.workorder',
+            'res_id': self.sr_workorder_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
     def _prepare_purchase_order_vals(self, buyer):
         # Reuses sr_maintenance's own purchase.order.sr_workorder_id field
         # (added for its native "create a PO directly from a WO" flow)

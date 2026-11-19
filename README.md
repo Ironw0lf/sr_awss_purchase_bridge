@@ -60,6 +60,9 @@ modified, only extended.
   Schedule) also waits for the work order's purchase requests: one still in
   approval, or approved without its purchase order yet, keeps the work order
   waiting. Once converted, the purchase order's own reception check applies.
+- A **Work Order** smart button on the Purchase Request form (shown when
+  the request is linked to a work order) opens that work order, with its
+  number on the button.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.

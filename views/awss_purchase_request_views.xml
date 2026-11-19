@@ -9,6 +9,16 @@
             <field name="department_id" position="after">
                 <field name="sr_workorder_id" readonly="1" invisible="not sr_workorder_id"/>
             </field>
+            <div name="button_box" position="inside">
+                <button name="action_view_sr_workorder" type="object"
+                        class="oe_stat_button" icon="fa-wrench"
+                        invisible="not sr_workorder_id">
+                    <div class="o_stat_info">
+                        <field name="sr_workorder_name" class="o_stat_value"/>
+                        <span class="o_stat_text">Work Order</span>
+                    </div>
+                </button>
+            </div>
         </field>
     </record>
 
