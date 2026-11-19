@@ -125,6 +125,19 @@ class SrWorkorder(models.Model):
             if not self.message_ids.filtered(lambda m: m.body and body in m.body):
                 self.message_post(body=body)
 
+    def _has_pending_purchases(self):
+        # The hourly parts check (sr_maintenance) must not move a work order
+        # to Ready while a purchase request is still going through approval:
+        # nothing has been ordered yet. A request already converted into a
+        # purchase order is covered by the order's own reception check.
+        self.ensure_one()
+        if super()._has_pending_purchases():
+            return True
+        return any(
+            request.state not in ('rejected', 'cancel') and not request.purchase_order_id
+            for request in self.purchase_request_ids
+        )
+
     def action_view_purchases(self):
         self.ensure_one()
 

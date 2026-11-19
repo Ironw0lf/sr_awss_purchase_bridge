@@ -56,6 +56,10 @@ modified, only extended.
   work order without a source Purchase Request (`awss_source_request_id`)
   is refused, however it is attempted (form, import, API), so no RFQ can be
   raised outside the approval flow. Existing orders are not touched.
+- The hourly parts check of SR Maintenance (Awaiting Parts to Ready to
+  Schedule) also waits for the work order's purchase requests: one still in
+  approval, or approved without its purchase order yet, keeps the work order
+  waiting. Once converted, the purchase order's own reception check applies.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.
