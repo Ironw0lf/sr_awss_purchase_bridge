@@ -1,6 +1,6 @@
 {
     'name': 'SR Maintenance - AWSS Purchase Request Bridge',
-    'version': '19.0.1.2.1',
+    'version': '19.0.1.3.0',
     'summary': 'Links SR Maintenance work orders to AWSS Purchase Request instead of a raw Purchase Order',
     'description': """
 SR Maintenance - AWSS Purchase Request Bridge
