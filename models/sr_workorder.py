@@ -100,6 +100,18 @@ class SrWorkorder(models.Model):
     def action_view_purchases(self):
         self.ensure_one()
 
+        # The smart button's count is the number of purchase orders linked to
+        # the work order. A purchase order that was not raised through a
+        # request linked to this work order (created directly, or before this
+        # bridge, or from a request opened outside the work order's button)
+        # has no Purchase Request to list, so the button would open an empty
+        # list under a count of 2. In that case show the purchase orders.
+        has_requests = self.env['awss.purchase.request'].search_count(
+            [('sr_workorder_id', '=', self.id)], limit=1
+        )
+        if not has_requests and self.purchase_order_ids:
+            return super().action_view_purchases()
+
         return {
             'type': 'ir.actions.act_window',
             'name': _("Purchase Requests"),

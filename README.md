@@ -45,6 +45,10 @@ modified, only extended.
   order's Purchase Requests instead of Purchase Orders - a request
   already gives access to the resulting order once approved, via its own
   smart button.
+  When the work order has purchase orders but no Purchase Request linked
+  to it (orders created directly, or before this bridge), the button opens
+  those purchase orders instead, so it never lands on an empty list under
+  a non-zero count.
 
 ## Dependencies
 
