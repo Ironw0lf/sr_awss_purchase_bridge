@@ -63,9 +63,11 @@ modified, only extended.
 - A **Work Order** smart button on the Purchase Request form (shown when
   the request is linked to a work order) opens that work order, with its
   number on the button.
-- The request's **Motivation** is filled with the work order number and,
-  on the next line, its description, so approvers see what the purchase is
-  for without opening the work order.
+- The request's **Motivation** is filled from the work order, one item per
+  line: number, description, equipment, location, type and team, and the
+  project (marked CAPEX when it is). Approvers see what the purchase is
+  for without opening the work order. Lines with nothing to show are left
+  out.
 - Falls back to the current user's own employee record when the work
   order's requester has none linked, so the request can still resolve a
   department/approver.

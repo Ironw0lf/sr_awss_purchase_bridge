@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import _, api, fields, models
 
-from .purchase_needs import purchase_needs
+from .purchase_needs import purchase_motivation, purchase_needs
 
 
 class SrWorkorder(models.Model):
@@ -103,11 +103,8 @@ class SrWorkorder(models.Model):
         }
 
     def _purchase_motivation(self):
-        """The request's Motivation: the work order number, then its
-        description on the next line so the approvers see what the purchase is
-        for without opening the work order."""
         self.ensure_one()
-        return '\n'.join(part for part in (self.name, self.description) if part)
+        return purchase_motivation(self)
 
     def _post_purchase_split_note(self, needs):
         """Say in the chatter which parts were left out of the purchase

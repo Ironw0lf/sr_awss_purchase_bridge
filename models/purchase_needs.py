@@ -10,6 +10,7 @@ A plain function on purpose, not a model method: it only reads the work
 order and its products, so it can be checked on its own (the module itself
 needs awss_purchase_request to load).
 """
+from odoo import _
 
 
 def _is_stocked(product):
@@ -63,3 +64,33 @@ def purchase_needs(workorder):
             result['buy'].append((line, needed - free))
 
     return result
+
+
+def purchase_motivation(workorder):
+    """The Motivation text of the purchase request raised from a work order:
+    what the purchase is for, so approvers don't have to open the work order.
+    Number, description, equipment, location, type and team, and the project
+    (marked CAPEX when it is)."""
+    wo = workorder
+    lines = [wo.name, wo.description]
+
+    if wo.equipment_id:
+        lines.append(_("Equipment: %s", wo.equipment_id.display_name))
+
+    location = wo.location_id or wo.equipment_id.location_id
+    if location:
+        lines.append(_("Location: %s", location.display_name))
+
+    details = []
+    if wo.type_id:
+        details.append(_("Type: %s", wo.type_id.name))
+    if wo.team_id:
+        details.append(_("Team: %s", wo.team_id.name))
+    if details:
+        lines.append(' | '.join(details))
+
+    if wo.project_id:
+        project = _("Project: %s", wo.project_id.display_name)
+        lines.append(project + (' (CAPEX)' if wo.is_capex else ''))
+
+    return '\n'.join(line for line in lines if line)
