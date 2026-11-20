@@ -84,7 +84,7 @@ class SrWorkorder(models.Model):
         context = {
             'default_sr_workorder_id': self.id,
             'default_requester_id': employee.id,
-            'default_motivation': self.name,
+            'default_motivation': self._purchase_motivation(),
             # Keeps the WO's analytic distribution on the lines - without
             # this, the header Analytic Account (computed from the
             # requester's department) pushes onto every line on open and
@@ -101,6 +101,13 @@ class SrWorkorder(models.Model):
             'view_mode': 'form',
             'context': context,
         }
+
+    def _purchase_motivation(self):
+        """The request's Motivation: the work order number, then its
+        description on the next line so the approvers see what the purchase is
+        for without opening the work order."""
+        self.ensure_one()
+        return '\n'.join(part for part in (self.name, self.description) if part)
 
     def _post_purchase_split_note(self, needs):
         """Say in the chatter which parts were left out of the purchase
